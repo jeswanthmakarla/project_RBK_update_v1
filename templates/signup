@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign-Up</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/registration_styles.css')}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+</head>
+<body>
+
+    <div id="bg_img"></div>
+    <div class="container">
+
+        <form onsubmit="navigateToSelectedUrl(event);" >
+            <center>
+                <select class="formo" name='mandal'  onchange="get_villages(this.value)">
+                    <option>-</option>
+                    {% for mandal in mandals %}
+                    <option value="{{ mandal }}" >{{ mandal }}</option>
+                    {% endfor %}
+                </select>
+                <select class="formo" name="village" id="village_select" onchange="get_rbks(this.value)">
+                </select>
+                
+                <select name="registred_rbK_id" class="formo" id="rbk_select" >
+                </select>
+                
+                <select class="formo" id="select-opening">
+                    <option style="color:grey">--Select--</option>
+                    <option value="/ricemill_reg">Rice Miller</option>
+                    <option value="/farmer_reg">Farmer</option>
+                    <option value="/transport_reg">Transport Owner</option>
+                </select>
+        
+                <br><br><br><br>
+                <button type="submit" class="bto"><b>Next</b></button><br><br>
+            </center>
+        </form>
+        
+        <script>
+        function navigateToSelectedUrl(event) {
+          event.preventDefault();
+          
+          const selectElement = document.getElementById("select-opening");
+          const selectedUrl = selectElement.value.split("?")[0]; 
+          window.location.href = selectedUrl + "?" + new URLSearchParams(new FormData(event.target)).toString();
+        }
+
+        const get_villages = async (mandal) =>{
+            const response = await fetch(`/get_place_info/mandal?item_=${mandal}`);
+            const data = await response.json()
+            village_select.innerText = ''
+            data.forEach(element => {
+                option_tag = document.createElement('option')
+                option_tag.value = element
+                option_tag.innerText = element
+                village_select.appendChild(option_tag)
+            });   
+        }
+        const get_rbks = async (village) =>{
+            const response = await fetch(`/get_place_info/village?item_=${village}`);
+            const data = await response.json()
+            rbk_select.innerText = ''
+            data.forEach(element => {
+                option_tag = document.createElement('option')
+                option_tag.value = element['rbk_id']
+                option_tag.innerText = element['rbk_id'] + '    ' + element['fullname']
+                rbk_select.appendChild(option_tag)
+            });  
+        }
+        </script>
+        
+    </div>
+
+</body>
+</html>

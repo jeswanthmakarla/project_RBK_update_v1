@@ -1,0 +1,145 @@
+body {
+    background-color: rgb(49,198,49);
+    padding: 20px ;
+}
+
+#bg_img {
+    background-image: url('../images/sunny3.png');
+    background-repeat:no-repeat;
+    background-size: 650px 150px;
+    background-position: center left;
+    border-top-left-radius: 20px;
+    text-align: center;
+}
+
+header{
+    height: 180px;
+    width:100%;
+    background-color: white; 
+    border-top-left-radius: 20px;  
+    border-top-right-radius: 20px;
+}
+    
+.container {
+    background-color: white;
+    padding: 10px;
+    margin-top: 5px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    min-height:500px;
+}
+
+.btn {
+    background-color: white;
+    color: rgb(49,198,49);
+    font-size: 20px;
+    font-weight: bolder;
+    border: 2px solid rgb(49,198,49);
+    border-radius: 20px;
+    padding:10px;
+    margin:5px 10px;
+    min-width: 150px;
+    text-decoration: none;
+}
+.reverse{
+    background-color: rgb(49,198,49);
+    color: white;
+}
+.btn:hover {
+    background-color: rgb(49,198,49);
+    color: white;
+    cursor: pointer;
+}
+.reverse:hover{
+    background-color: white;
+    color: rgb(49,198,49);
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    width:600px;
+    margin:30px auto;
+    border: solid rgb(49,196,49) 2px;
+    border-radius: 20px;
+}
+.formo
+{
+    margin:10px 5px;
+    padding:5px;
+    width: 80%;
+    height:50px;
+    border-style:solid;
+    border-width:4px;
+    border-color:rgb(49,196,49);
+    border-radius:10px;
+    font-size:20px;
+    text-align: center;
+}
+::placeholder
+{
+    font-size: 25px;
+    font-family:bold;
+    color:rgb(174, 179, 174);
+    text-align:center;
+}
+
+.bto
+{
+    width:250px;
+    padding:10px;
+    border:solid rgb(49,196,49) 2px;
+    color: rgb(49,196,49);
+    border-radius:25px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 20px;
+}
+.bto:hover{
+    box-shadow: 0px 5px 5px rgba(0,0,0,0.4);
+}
+h1.title{
+    color:rgb(49,196,49);
+}
+
+
+
+table, td, th {
+    border:solid rgb(49,198,49) 2px;
+}
+.no-border td, .no-border th {
+    border: none;
+    padding: 5px;
+}
+table {
+    width: 100%;
+    text-align: center;
+    font-size: larger;
+    border-collapse: collapse;
+}
+th, td {
+    padding:10px 5px;
+}
+tr>th{
+    background-color: rgb(49,198,49);
+    color: white;
+    font-size: larger;
+    border-right: solid white 2px;
+    border-top: solid white 3px;
+}
+
+
+
+fieldset{
+    width:500px;
+    border:solid rgb(49,198,49) 2px;
+    border-radius: 20px;
+    color:rgb(49,198,49);
+    font-size: large;
+    font-weight: bold;
+    margin: 10px;
+    height: fit-content;
+}
+.flex_box_row_wrap{
+    display: flex;
+}

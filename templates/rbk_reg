@@ -1,0 +1,36 @@
+{% extends 'basereg.html' %}
+
+{% block form %}
+                    <h1 class="title"><u>RBK Registration Form</u></h1>
+                    <input type="text" autocomplete="off" name="fullname" class="formo" placeholder="Fullname">
+                    <input type="text" autocomplete="off" name="phone" class="formo" placeholder="Phone Number" minlength="10" maxlength="10">  
+                    <select class="formo" name='mandal'  onchange="get_villages(this.value)">
+                        <option>-</option>
+                        {% for mandal in mandals %}
+                        <option value="{{ mandal }}" >{{ mandal }}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="formo" name="village" id="village_select" >
+                    </select>
+                    
+                    <input type="password" required name="password" id="passwd" autocomplete="off" class="formo" placeholder="Set new password">  
+                    <input type="password" required name="cnf_password"  id="cnf_passwd" autocomplete="off" class="formo" placeholder="Confirm password" onkeyup="validate_password()">  
+                    <span id="spn" style="color:red; display: none;">Passwords did not match.</span>  
+                    
+                    <br><br><br><br>
+                    <button type="submit" class="bto"><b>SUBMIT</b></button><br><br>
+
+                    <script>
+                        const get_villages = async (mandal) =>{
+                        const response = await fetch(`/get_place_info/mandal?item_=${mandal}`);
+                        const data = await response.json()
+                        village_select.innerText = ''
+                        data.forEach(element => {
+                            option_tag = document.createElement('option')
+                            option_tag.value = element
+                            option_tag.innerText = element
+                            village_select.appendChild(option_tag)
+                        });   
+                    }
+                    </script>
+{% endblock %}

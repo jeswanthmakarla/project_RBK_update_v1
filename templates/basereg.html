@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign up</title>
+        <link rel="stylesheet" href="{{url_for('static',filename='css/registration_styles.css')}}">
+        <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    </head>
+    <body>
+        <div id="bg_img"></div>
+        <div class="container">
+            <form onsubmit="register(event)">
+                <center>
+                    {% block form %}{% endblock %}
+                </center>
+                <script>
+
+                    const register = async (event) =>{
+                            event.preventDefault()
+                            const formData = Object.fromEntries([...new FormData(event.target).entries()]);
+                            const jsonData = JSON.stringify(formData);
+
+                            let source = '/{{ reg_type }}'
+                            let payload = { 
+                                method: "POST",
+                                headers: {
+                                            'Content-Type': 'application/json'
+                                            },
+                                body: jsonData
+                                }
+                            
+                            
+                            const response = await fetch(source,payload);
+                            const data = await response.json()
+                            if (response.ok) {
+                                if (data['status'] === 'ok') {
+                                    alert('User Registered Successfully. Try Login.');
+                                    window.location = '/login';
+                                } else {
+                                    alert('Registration Failed.');
+                                }
+                            } else {
+                                alert(`HTTP error! Status: ${response.status}`);
+                            }
+                    }
+                    const validate_password = ()=>{
+                            let passwd = document.getElementById('passwd').value
+                            let cnf_passwd = document.getElementById('cnf_passwd').value
+                            
+                            if(cnf_passwd!=passwd){
+                                document.getElementById('spn').style.display = 'block'
+                            }
+                            else{
+                                document.getElementById('spn').style.display = 'none'
+                            }
+                    }
+                </script>
+            </form>
+        </div>   
+    </body>
+</html>

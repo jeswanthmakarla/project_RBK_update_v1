@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block added_styles %} 
+<link rel="stylesheet" href="{{ url_for('static',filename='css/jquery-ui.css') }}">
+<style>
+  #date-picker {
+    display: none;
+  }
+  #calendar-container {
+    width: 450px;
+    margin: 0 auto;
+    
+  }
+  .ui-datepicker {
+    font-size: 18px;
+    background: white;
+    width: 100%;
+    color: rgb(49,198,49);
+    
+  }
+  .ui-widget.ui-widget-content{
+    border:none;
+    border-radius: 10px;
+  }
+  .ui-state-default, .ui-widget-content .ui-state-default{
+    border:none;padding:20px;
+    background: none;
+  }
+  .ui-widget-header{
+    background: rgb(49,198,49);
+    color: white;
+  }
+  
+  .ui-datepicker-calendar td a.ui-state-active {
+    background: white;
+    color: black;
+    }
+
+    .ui-datepicker-calendar td a:hover:not(.ui-state-active) {
+    background: rgb(49,198,49);
+    color: white;
+    
+    }
+
+    .ui-datepicker-calendar td a.ui-state-highlight {
+    background: white;
+    color: rgb(49,198,49);
+    }
+ 
+</style>
+{% endblock %}
+
+{% block user_details_table %}
+        <table class="no-border" style="border:none; text-align: left; font-size: medium;" >
+          <tr> <td><b>Name : </b></td>    <td colspan="3">{{ user_details['fullname'] }}</td> <td><b>RBK ID : </b></td>   <td>{{ user_details['rbk_id'] }}</td> </tr>
+          <tr> <td><b>Phone : </b></td>   <td>{{ user_details['phone'] }}</td>  <td><b>Mandal : </b></td>  <td>{{ user_details['mandal'] }}</td> <td><b>Village : </b></td>  <td>{{ user_details['village'] }}</td> </tr>
+          <tr> <td><b>Address : </b></td> <td colspan="5">{{ user_details['address'] }}</td></tr>
+          <tr> <td><b>Vehicle Type : </b></td>   <td>{{ user_details['vehicle_type'] }}</td>  <td><b>Vehical No. : </b></td>  <td>{{ user_details['vehicle_no'] }}</td> <td><b>Vehicle Record : </b></td>  <td>{{ user_details['vehicle_rec'] }}</td> </tr>
+        </table>
+{% endblock %}
+
+{% block container_content %}
+<div>
+    <center>
+      <button class="btn reverse" id="btn1">Booking Availbility</button>
+      <button class="btn" id="btn2">Database of transportation</button>
+      <button class="btn" id="btn3">Message to RBK</button>
+    </center>
+  </div>
+
+   <div id="form_1" > 
+    <form style="border: none;" action="#">
+      <div id="calendar-container">
+        <div id="selected-dates"></div>
+      </div>
+      <br>
+      <button id="submit-button" type="submit" class="btn reverse">Submit</button>
+    </form>
+    
+    <script src="{{ url_for('static',filename='js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/jquery-ui.min.js') }}"></script>
+    <script>
+      var selectedDates = {{ user_details['available_dates'] }};
+      var fullname = "{{ user_details['fullname'] }}";
+      var phone = "{{ user_details['phone'] }}";
+      $(function() {
+        $("#calendar-container").datepicker({
+          dateFormat: "yy-mm-dd",
+          minDate: new Date(), 
+          onSelect: function(dateText, inst) {
+            var index = selectedDates.indexOf(dateText);
+            if (index !== -1) {
+              selectedDates.splice(index, 1);
+              $("#selected-dates").find('span[data-date="' + dateText + '"]').remove();
+              $(this).find('.ui-state-active').removeClass('ui-state-active'); // remove active state from selected date
+            } else {
+              selectedDates.push(dateText);
+              $("<span style='display:none;'>")
+                .addClass("selected-date")
+                .attr("data-date", dateText)
+                .text(dateText)
+                .appendTo("#selected-dates")
+                .click(function() {
+                  var dateText = $(this).attr("data-date");
+                  $(this).remove();
+                  var index = selectedDates.indexOf(dateText);
+                  if (index !== -1) {
+                    selectedDates.splice(index, 1);
+                  }
+                  $("#calendar-container").datepicker("setDate", ""); // reset datepicker to clear active state
+                });
+              $(this).find('td[data-month="' + inst.selectedMonth + '"][data-year="' + inst.selectedYear + '"]').find('a.ui-state-default:contains("' + inst.selectedDay + '")').addClass('ui-state-active'); // add active state to selected date
+            }
+          },
+          beforeShowDay: function(date) {
+            var year = date.getFullYear();
+            var month = date.getMonth() + 1;
+            var day = date.getDate();
+            var dateString = year + "-" + (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+            var index = selectedDates.indexOf(dateString);
+            if (index !== -1) {
+              return [true, "ui-state-active"]; // add active state to previously selected dates
+            } else {
+              return [true, ""];
+            }
+          },
+          onChangeMonthYear: function(year, month, inst) {
+            var dates = selectedDates.filter(function(date) {
+              var parts = date.split("-");
+              return parts[0] == year && parts[1] == month;
+            });
+            $(this).find('.ui-state-active').removeClass('ui-state-active');
+            for (var i = 0; i < dates.length; i++) {
+                var parts = dates[i].split("-");
+              $(this).find('td[data-month="' + (parts[1] - 1) + '"][data-year="' + parts[0] + '"]').find('a.ui-state-default:contains("' + parts[2] + '")').addClass('ui-state-active');
+            }
+          },
+          onClose: function() {
+            $(this).datepicker("setDate", ""); // reset datepicker to clear active state
+          },
+          beforeShow: function() {
+            $(this).datepicker("setDate", ""); // reset datepicker to clear active state
+            return {
+              minDate: new Date() // prevent selecting past dates
+            };
+          }
+        });
+        $("#calendar-container .ui-datepicker-trigger").click(); // trigger click on datepicker icon to show calendar
+        $("#date-picker").hide(); // hide input field
+        $("#submit-button").click( async () => {
+                let source = '/transport_update/available_dates'
+                let payload = { 
+                    method: "POST",
+                    headers: {
+                              'Content-Type': 'application/json'
+                              },
+                    body: JSON.stringify({
+                                "fullname": `${fullname}`,
+                                "phone": `${phone}`,
+                                "available_dates": JSON.stringify(selectedDates), 
+                            }) 
+                    }
+
+                const response = await fetch(source,payload);
+                const data = await response.json()
+                      if (data['status']=='ok'){
+                        alert('Avalialbe dates Uppdated.')
+                        window.location.reload()
+                      }
+        });
+      });
+    </script>
+
+  </div>
+
+  <div id="form_2" style="display: none;">
+    <div  style="width: 90%; border:none; margin: 50px auto;">
+      <center>
+          <table >
+            <tr>
+              <th>Track ID</th>
+              <th>Customer Name</th>
+              <th>Customer Pone</th>
+              <th>Date Booked</th>
+              <th>Time Slot</th>
+              <th> From (Customer Location)</th>
+              <th>To (Mill Location)</th>
+              <th>Vehicle Type</th>
+              <th>Vehicle No.</th>
+              <th>Trip Status</th>
+            </tr>
+            {% for row in queue %}
+            <tr>
+              <td>{{ row['track_id'] }}</td>
+              <td>{{ row['c_fullname'] }}</td>
+              <td>{{ row['c_phone'] }}</td>
+              <td>{{ row['date_booked'] }}</td>
+              <td>{{ row['time_slot'] }}</td>
+              <td>{{ row['from_'] }}</td>
+              <td>{{ row['to_'] }}</td>
+              <td>{{ row['vehicle_type'] }}</td>
+              <td>{{ row['vehicle_no'] }}</td>
+              <td>{{ row['status'] }}</td>
+            </tr>
+            {% endfor %}            
+          </table>
+      </center>
+    </div>
+  </div>
+
+  <div id="form_3" style="display: none;">
+    <form style="border:none; width:70%" >
+      <center>
+          <fieldset><legend > Enter your Message </legend>
+            <textarea id="msg_content" class="" style="width:100%; height:200px; border:none;" onfocus="this.style.outline='none'"></textarea>
+          </fieldset> 
+          <br><br><br><br>
+          <button type="button" onclick="send_msg()" class="btn reverse"><b>SUBMIT</b></button><br><br>
+      </center>
+    </form>
+  </div>
+
+
+  <script>
+    var c_fullname = "{{ user_details['fullname'] }}"
+    var c_phone = "{{ user_details['phone'] }}"
+    var rbk_id = "{{ user_details['rbk_id'] }}"
+  </script>
+  <script src="{{ url_for('static',filename='js/send_msg.js') }}"></script>
+  <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
+{% endblock %}

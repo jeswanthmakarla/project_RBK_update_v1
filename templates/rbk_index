@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block added_styles %}
+<style>
+input[type="checkbox"]{
+  width: 20px;
+  height: 20px;
+}
+</style>
+{% endblock %}
+
+{% block user_details_table %}
+        <table class="no-border" style="border:none; text-align: left; font-size: larger;position: relative; top:30px;" >
+          <tr><td><b>RBK ID : </b></td> <td>{{ user_details['rbk_id'] }}</td> <td><b>Mandal : </b></td> <td>{{ user_details['mandal'] }}</td>  <td><b>Village : </b></td><td>{{ user_details['village'] }}</td></tr>
+          <tr style="height:30px"></tr>
+          <tr><td><b>Name : </b></td><td colspan="3">{{ user_details['fullname'] }}</td>  <td><b>Phone : </b></td><td >{{ user_details['phone'] }}</td> </tr>
+        </table>
+{% endblock %}
+
+{% block container_content %}
+<div>
+    <center>
+      <button class="btn reverse" id="btn1">Crops Queue</button>
+      <button class="btn" id="btn2">Data Base</button>
+      <button class="btn" id="btn3">Messages</button>
+    </center>
+  </div>
+
+  <div id="form_1" >
+    <div class="flex_box_row_wrap">
+      <div style="width: 1400px; margin-top: 50px;">
+        <div  style="width: 100%;">
+          <center>
+              <table style=" font-size: medium; margin:auto;">
+                <tr>
+                  <th>Select</th>
+                  <th>Crop ID</th>
+                  <th>Farmen Name</th>
+                  <th>Survey No.</th>
+                  <th>Crop Type</th>
+                  <th>Crop Cut Date</th>
+                  <th>Quality Check Date</th>
+                  <th>Sell Date</th>
+                  <th>No. of Bags</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+                {% for record in crops_queue %}
+                <tr>
+                  <td> <input type="radio" name="select_one row" onchange="show_id('{{ record['crop_id'] }}')"></td>
+                  <td> {{ record['crop_id'] }}</td>
+                  <td> {{ record['farmer_name'] }}</td>
+                  <td> {{ record['survey_no'] }}</td>
+                  <td> {{ record['crop_type'] }}</td>
+                  <td> {{ record['cut_date'] }}</td>
+                  <td> <input type="checkbox" id="{{ record['crop_id'] }}_qc_check" {% if record['qc_check']=='True' %} checked disabled {% endif %}> {{ record['qc_date'] }}</td>
+                  <td> {{ record['sell_date'] }}</td>
+                  <td style="padding:0px"> <input type="number" id="{{ record['crop_id'] }}_bags_req" style="width: 100%; height: 100%; box-sizing: border-box; border: none; text-align: center;" {% if not record['bags_req'] %} value=0 {% else %} value={{ record['bags_req'] }} {% endif %}> </td>
+                  <td style="padding:0px"> <input type="number" id="{{ record['crop_id'] }}_amount" style="width: 100%; height: 100%; box-sizing: border-box; border: none; text-align: center;" {% if not record['amount'] %} value=0 {% else %} value={{ record['amount'] }} {% endif %}> </td>
+                  <td> {{ record['status'] }}</td>
+                </tr>
+                {% endfor %}
+              </table>
+          </center>
+        </div>
+      </div>
+
+      <hr style="margin-top: 50px; border-color:rgb(49,198,49); box-shadow: none;">
+
+      <div style="width: 400px; margin-left: 0px; margin-top:0px;">
+        <div style="display: flex; flex-direction: column;">
+          <p id="id_area" style="font-weight: bolder; font-size: larger; text-align: center; "></p>
+          <div>
+            <p style="text-align: center; color: rgb(49,198,49); font-size: large; font-weight: bolder;">Assign Transport</p>
+            <select name="" id="selected_transport" style="width: 100%; padding:5px 1px; border:solid rgb(49,198,49) 2px; border-radius: 10px;" onfocus="this.style.outline='none'">
+              {% for transport in transports %}
+              <option value="{{ transport['vehicle_no'] }};{{ transport['available_on'] }}">{{  format( transport['trips'] , '\u00A0<5') + format(transport['vehicle_type'] ,'\u00A0<15') + format(transport['vehicle_no'] ,'\u00A0<15') + format(transport['available_on'] ,'\u00A0>11') }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <p style="text-align: center; color: rgb(49,198,49); font-size: large; font-weight: bolder;">Assign Ricemill</p>
+            <select name="" id="selected_mill" style="width: 100%; padding:5px 1px; border:solid rgb(49,198,49) 2px; border-radius: 10px;" onfocus="this.style.outline='none'">
+              {% for mill in ricemills %}
+              <option value="{{ mill['millname'] }};{{ mill['mandal'] }}">{{  format(mill['millname'] ,'\u00A0<25') + format(mill['village'],'\u00A0^20') + format(mill['mandal'],'\u00A0>15') }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div style="margin-top: 30px;">
+          <button id="rbk_btn" style="width: 100%;color:white; background-color: rgb(49,198,49); border:solid rgb(49,198,49) 2px; border-radius: 20px; cursor: pointer; padding:10px">Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="form_2" style="display: none;">
+    <div style="margin-top:50px; display: flex; flex-direction: row;">
+      <div style="width:300px; display: flex; flex-direction: column; height:400px">
+          <button class="btn other_btn"  id="btn4" onclick="rbk_get_details('db_crops',this)" >Crops Sales</button>
+          <button class="btn other_btn"  id="btn5" onclick="rbk_get_details('db_transport_queue',this)">Transport Queue</button>
+          <button class="btn other_btn"  id="btn6" onclick="rbk_get_details('db_farmers_surveys',this)">Farmers DB</button>
+          <button class="btn other_btn"  id="btn7" onclick="rbk_get_details('db_transport_owners',this)">Transport Users DB</button>
+          <button class="btn other_btn"  id="btn8" onclick="rbk_get_details('db_ricemill_owners',this)">Ricemill Users DB</button>
+      </div>
+      <div style="width: 100%;">
+        <div id="rbk_db_content" style="width: 95%; margin: auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="form_3" style="display: none;">
+    <form style="border:none; width:70%">
+      <center>
+          <table>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Survey No.</th>
+              <th style="width:400px">Message</th>
+              <th>Status</th>
+            </tr>
+            {% for row in messages %}
+            <tr>
+              <td>{{ row['c_fullname'] }}</td>
+              <td>{{ row['c_phone'] }}</td>
+              <td>{{ row['survey_no'] }}</td>
+              <td><pre style="text-align: left;">{{ row['message'] }}</pre></td>
+              <td>{{ row['status'] }}</th>
+            </tr>
+            {% endfor %}
+          </table>
+      </center>
+    </form>
+  </div>
+
+  <script>
+    var fullname = "{{ user_details['fullname'] }}"
+    var phone = "{{ user_details['phone'] }}"
+    var rbk_id = "{{ user_details['rbk_id'] }}"
+  </script>
+  <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
+
+  <script>
+    var selected_crop_id = ''
+    const show_id = (crop_id)=>{
+        selected_crop_id = crop_id
+        id_area.textContent = 'Crop ID : ' + crop_id
+        let qc_check = document.getElementById(selected_crop_id + '_qc_check')
+        if(qc_check.checked){
+            rbk_btn.addEventListener('click', ()=>{entry_record('update')})
+        }
+        else{
+            rbk_btn.addEventListener('click', ()=>{entry_record('new')})
+        }
+    }
+    const entry_record = async (type_)=>{
+      qc_chekced = document.getElementById(selected_crop_id + '_qc_check')
+      crop_amount = document.getElementById(selected_crop_id + '_amount')
+      crop_bags = document.getElementById(selected_crop_id + '_bags_req')
+
+
+      if(!qc_chekced){ alert('no record selected.')}
+      else{
+          if(!qc_chekced.checked){
+            alert('cannot assign transport or ricemill untill Quality Check is done.')
+          }
+          else{
+
+              let source = '/rbk_assign'
+              let payload = { 
+                  method: "POST",
+                  headers: {
+                            'Content-Type': 'application/json'
+                            },
+                  body: JSON.stringify({
+                              "rbk_id": rbk_id,
+                              "crop_id": selected_crop_id,
+                              "crop_amount": crop_amount.value ,
+                              "crop_bags": crop_bags.value ,
+                              "selected_transport": selected_transport.value,
+                              'selected_mill' : selected_mill.value,
+                              "type_" : type_
+                          }) 
+                  }
+
+              const response = await fetch(source,payload);
+              const data = await response.json()
+                    if (data['status']=='ok'){
+                      alert(`Quality Check Updated. Transport and Ricemill assigned Successfully.`)
+                      window.location.reload()
+                    }
+              
+          }
+        }
+      }
+
+      const rbk_get_details = async (type_, btn) =>{
+
+              
+                const elements = document.getElementsByClassName("other_btn");
+                for (let i = 0; i < elements.length; i++) {
+                  elements[i].classList.remove("reverse");
+                }
+                
+              
+              btn.classList.add('reverse')
+
+              let source = '/rbk_get_details/'+type_
+
+              const response = await fetch(source);
+              const data = await response.json()
+
+              var table = document.createElement('table');
+              
+              if(type_=='db_crops'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Crop ID</th><th>Farmer Name</th><th>Survey No.</th><th>Crop Type</th><th>Cut Date</th><th>Quality Check Date</th><th>Sell Date</th>
+                <th>No. of BAGS</th><th>Amount</th><th>Status</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['crop_id']}</td><td>${row['farmer_name']}</td><td>${row['survey_no']}</td><td>${row['crop_type']}</td><td>${row['cut_date']}</td>
+                  <td>${row['qc_date']}</td><td>${row['sell_date']}</td><td>${row['bags_req']}</td><td>${row['amount']}</td><td>${row['status']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_transport_queue'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Track ID</th><th>Crop ID</th><th>Farmer Name</th><th>Farmer Phone</th><th>Driver Name</th><th>Driver Phone</th><th>From</th><th>To</th>
+                <th>Vehicle Type</th><th>Vehicle No.</th><th>Status</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['track_id']}</td><td>${row['crop_id']}</td><td>${row['c_fullname']}</td><td>${row['c_phone']}</td><td>${row['d_fullname']}</td><td>${row['d_phone']}</td>
+                  <td>${row['from_']}</td><td>${row['to_']}</td><td>${row['vehicle_type']}</td><td>${row['vehicle_no']}</td><td>${row['status']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_farmers_surveys'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Farmer Name</th><th>Phone</th><th>Address</th><th>Survey No.</th><th>Land Capacity</th><th>Field Passbook</th><th>Bank A/C No.</th><th>Aadhaar</th>
+                <th>Village</th><th>Mandal</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['fullname']}</td><td>${row['phone']}</td><td>${row['address']}</td><td>${row['survey_no']}</td><td>${row['land_capacity']}</td><td>${row['land_passbook']}</td>
+                  <td>${row['bank_ac']}</td><td>${row['aadhaar_no']}</td><td>${row['village']}</td><td>${row['mandal']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_transport_owners'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Owner Name</th><th>Phone</th><th>Address</th><th>Vehicle Type</th><th>Vehicle No</th><th>No. of Trips</th><th> Vehicle Record</th><th>Village</th><th>Mandal</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['fullname']}</td><td>${row['phone']}</td><td>${row['address']}</td><td>${row['vehicle_type']}</td><td>${row['vehicle_no']}</td><td>${row['trips']}</td>
+                  <td>${row['vehicle_rec']}</td><td>${row['village']}</td><td>${row['mandal']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+              if(type_=='db_ricemill_owners'){
+
+                var headerRow = document.createElement('tr');
+                headerRow.innerHTML = `<th>Owner Name</th><th>Mill Name</th><th>Mill Phone</th><th>Address</th><th>Storage Capacity</th><th>Milling Capacity</th><th>Dispatched Bags</th><th>Village</th><th>Mandal</th>`
+                table.appendChild(headerRow);
+
+                data.forEach(row => {
+                  var dataRowHtml = `<td>${row['fullname']}</td><td>${row['millname']}</td><td>${row['mill_phone']}</td><td>${row['address']}</td><td>${row['storage_capacity']}</td><td>${row['milling_capacity']}</td>
+                  <td>${row['dispatched_bags']}</td><td>${row['village']}</td><td>${row['mandal']}</td>`;
+                  var dataRow = document.createElement('tr');
+                  dataRow.innerHTML = dataRowHtml;
+                  table.appendChild(dataRow);
+                })
+              }
+
+
+              document.getElementById('rbk_db_content').innerHTML = ''
+              document.getElementById('rbk_db_content').appendChild(table)
+
+      }
+
+      window.addEventListener('load', function() { btn4.click();     });
+
+</script>
+{% endblock %}

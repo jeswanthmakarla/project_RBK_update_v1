@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block added_styles %}
+{% endblock %}
+
+{% block user_details_table %}
+        <table class="no-border" style="border:none; text-align: left; font-size: medium;" >
+          <tr>  <td><b>Owner Name : </b></td> <td colspan="2">{{ user_details['fullname'] }}</td>  <td colspan="2"><b>Mill Phone : </b></td> <td >{{ user_details['mill_phone'] }}</td>  </tr>
+          <tr>  <td><b>Mill Name : </b></td> <td colspan="2">{{ user_details['millname'] }}</td><td><b>Mandal : </b></td>   <td>{{ user_details['mandal'] }}</td> </tr>
+          <tr>  <td><b>Address : </b></td>   <td colspan="3">{{ user_details['address'] }}</td>  <td><b>Village : </b></td><td>{{ user_details['village'] }}</td> </tr>
+          <tr style="height: 20px;"></tr>
+          <tr>  <td><b>Storage Capacity(in BAGS)</b></td> <td>{{ user_details['storage_capacity'] }}</td> <td><b>Milling Capacity (in BAGS)</b></td>   <td>{{ user_details['milling_capacity'] }}</td> <td><b>Dispatched Bags : </b></td><td>{{ user_details['dispatched_bags'] }}</td></tr>
+
+        </table>
+{% endblock %}
+
+{% block container_content %}
+
+    <div>
+      <center>
+        <button class="btn reverse" id="btn1">Queue</button>
+        <button class="btn" id="btn2">Update Mill</button>
+        <button class="btn" id="btn3">Message to RBK</button>
+      </center>
+    </div>
+
+    <div id="form_1" >
+      <div  style="width: 90%; border:none; margin: 50px auto;">
+        <center>
+            <table>
+              <tr>
+                <th colspan="6">Load Details</th>
+                <th colspan="5">Transport Details</th>
+              </tr>
+              <tr>
+                <th>Crop ID</th>
+                <th>Survey No.</th>
+                <th>Farmer Name</th>
+                <th>Crop Get Date</th>
+                <th>No of Bags</th>
+                <th>Bags Status</th>
+                <th>Track ID</th>
+                <th>Owner Name</th>
+                <th>Phone</th>
+                <th>Vehicle No.</th>
+                <th>Vehicle Type</th>
+              </tr>
+              {% for row in queue %}
+              <tr>
+                <td>{{ row['crop_id'] }}</td>
+                <td>{{ row['survey_no'] }}</td>
+                <td>{{ row['c_fullname'] }}</td>
+                <td>{{ row['crop_get_date'] }}</td>
+                <td id="d3f4">{{ row['no_of_bags'] }}</td>
+                <td>
+                  {% if not row['bags_status'] %}
+                  <button onclick="bags_status('{{row['id']}}', 'dispatched', {{ row['crop_id'] }}, {{ row['track_id'] }} )" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >
+                    Dispatch</button>
+                  {% elif 'dispatched' in row['bags_status'] and 'received' not in row['bags_status'] %}
+                  <span style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; font-size:14px">Dispatched</span>
+                  <button onclick="bags_status('{{row['id']}}', 'dispatched received', {{ row['crop_id'] }}, {{ row['track_id'] }} )" style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; background-color: rgb(49,198,49); color:white; cursor: pointer;" >
+                    Received</button>
+                  {% elif 'dispatched' in row['bags_status'] and 'received' in row['bags_status'] %}
+                  <span style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; font-size:14px">Dispatched</span>
+                  <span style="border:solid rgb(49,198,49) 2px; padding:5px; border-radius: 10px; font-size:14px">Received</span>
+                  {% endif %}
+                  
+                </td>
+                <td>{{ row['track_id'] }}</td>
+                <td>{{ row['t_fullname'] }}</td>
+                <td>{{ row['t_phone'] }}</td>
+                <td>{{ row['vehicle_no'] }}</td>
+                <td>{{ row['vehicle_type'] }}</td>
+              </tr>
+              {% endfor %}            
+            </table>
+        </center>
+      </div>
+    </div>
+
+    <div id="form_2" style="display: none;">
+      <form style="border:none; width:90%;"
+            onsubmit="mill_update(this)">
+            <center class="flex_box_row_wrap">
+              <fieldset><legend >Storage Capacity (in BAGS) </legend>
+                <input type="text" class="formo" name="storage_capacity" value="{{ user_details['storage_capacity'] }}">
+              </fieldset>
+              <fieldset><legend >Milling Capacity (in BAGS) </legend>
+                <input type="text" class="formo" name="milling_capacity" value="{{ user_details['milling_capacity'] }}">
+              </fieldset>
+              <fieldset><legend >Dispatched BAGS </legend>
+                <input type="text" class="formo" name="dispatched_bags" value="{{ user_details['dispatched_bags'] }}">
+              </fieldset>
+            </center>
+            <br><br><br>
+            <button type="submit" class="btn reverse" style="width:50%;margin:auto"><b>SUBMIT</b></button><br><br>
+
+            <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
+      </form>
+    </div>
+
+    <div id="form_3" style="display: none;">
+      <form style="border:none; width:70%" >
+        <center>
+            <!-- <h1 class="title"><u> Registration form 1</u></h1> -->
+            <fieldset><legend > Enter your Message </legend>
+              <textarea id="msg_content" class="" style="width:100%; height:200px; border:none;" onfocus="this.style.outline='none'"></textarea>
+            </fieldset> 
+            <br><br><br>
+            <button type="button" onclick="send_msg()" class="btn reverse"><b>SUBMIT</b></button><br>
+        </center>
+      </form>
+    </div>
+
+
+  <script>
+    var c_fullname = "{{ user_details['fullname'] }}"
+    var c_phone = "{{ user_details['mill_phone'] }}"
+    var rbk_id = "{{ user_details['rbk_id'] }}"
+  </script>
+  <script src="{{ url_for('static',filename='js/send_msg.js') }}"></script>
+  <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
+{% endblock %}

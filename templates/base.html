@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriConnect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base_styles.css') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    {% block added_styles %} {% endblock %}
+</head>
+
+<body>
+	<header id="bg_img">
+    <div style="display: flex; justify-content: flex-end; align-items: center; padding:5px;">
+      <div style="max-width:750px; min-height: 180px; margin-right:100px;">
+        {% block user_details_table %} {% endblock %}
+      </div>
+    
+      <div style="max-width: 400px; margin-right: 100px;">
+        <a href="/logout" class="btn reverse"><span class="logout-symbol">&#10162;</span> &nbsp; Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    {% block container_content %} {% endblock %}
+  </div>
+</body>
+</html>

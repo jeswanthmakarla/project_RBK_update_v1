@@ -1,0 +1,66 @@
+#bg_img {
+    height: 250px;
+    background-image: url('../images/agrico.png');
+    background-size: 240px 240px;
+    background-repeat:no-repeat;
+    background-position: top left ;
+}
+.container
+{
+    width:900px;
+    margin:auto;
+    position: relative;
+    top:-100px;
+    padding-bottom:20px;
+
+    border-style:solid;
+    border-color:rgb(49,196,49);
+    border-top-width:40px;
+    border-bottom-width:20px;
+    border-left-width:80px;
+    border-right-width:80px;
+    border-radius:20px;
+    padding:10px;
+}
+form{
+    display: flex;
+    flex-direction: column;
+}
+.formo
+{
+    margin:10px 5px;
+    padding:5px;
+    width: 80%;
+    height:50px;
+    border-style:solid;
+    border-width:4px;
+    border-color:rgb(49,196,49);
+    border-radius:10px;
+    font-size:20px;
+    text-align: center;
+}
+::placeholder
+{
+    font-size: 25px;
+    font-family:bold;
+    color:rgb(174, 179, 174);
+    text-align:center;
+}
+
+.bto
+{
+    width:250px;
+    padding:10px;
+    border:solid rgb(49,196,49) 2px;
+    color: rgb(49,196,49);
+    border-radius:25px;
+    background-color: white;
+    cursor: pointer;
+    font-size: 20px;
+}
+.bto:hover{
+    box-shadow: 0px 5px 5px rgba(0,0,0,0.4);
+}
+h1.title{
+    color:rgb(49,196,49);
+}

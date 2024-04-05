@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block added_styles %}
+{% endblock %}
+
+{% block user_details_table %}
+        <table class="no-border" style="border:none; text-align: left; font-size: medium;" >
+          <tr><td><b>Name : </b></td><td colspan="3">{{ user_details['fullname'] }}</td> <td><b>RBK ID : </b></td><td>{{ user_details['rbk_id'] }}</td></tr>
+          <tr><td><b>Phone : </b></td><td colspan="2">{{ user_details['phone'] }}</td><td><b>Aadhaar : </b></td> <td colspan="2">{{ user_details['aadhaar_no'] }}</td></tr>
+          <tr><td><b>Mandal : </b></td> <td>{{ user_details['mandal'] }}</td><td><b>Village : </b></td><td>{{ user_details['village'] }}</td> <td><b>Bank A/C : </b></td><td>{{ user_details['bank_ac'] }}</td></tr>
+          <tr><td><b>Address : </b></td> <td colspan="5">{{ user_details['address'] }}</td></tr>
+        </table>
+{% endblock %}
+
+{% block container_content %}
+
+    <div>
+      <center>
+        <button class="btn reverse" id="btn1">Crop Sales</button>
+        <button class="btn" id="btn2">Crop sales details</button>
+        <button class="btn" id="btn3">Message to RBK</button>
+      </center>
+    </div>
+
+    <div id="form_1">
+      <form style="width: 100%; border:none;" onsubmit="sell_crops(this)">
+        <center class="flex_box_row_wrap">
+            <fieldset><legend > Survey Number and Crop Type</legend>
+              <select name="survey_no" class="formo">
+                {% for each in surveys %}
+                <option value="{{ each['survey_no'] }}"> {{ each['survey_no'] }} </option>
+                {% endfor %}
+              </select>
+              <select name="crop_type" class="formo">
+                <option value="Rice"> Rice </option>
+                <option value="Paddy"> Paddy </option>
+                <option value="Wheet"> Wheet </option>
+                <option value="Dhal"> Dhal </option>
+              </select>
+            </fieldset>
+          
+            <fieldset><legend > Crops info </legend>
+            <span>Cut Date</span>
+            <input type="date" name="cut_date" autocomplete="off" class="formo" placeholder="Crop cut date" required>
+            <br>
+            <span>Quality Check Date</span>
+            <input type="date" name="qc_date" autocomplete="off" class="formo" placeholder="Crop quality check date" required>
+            <br>
+            <span>Sell Date</span>
+            <input type="date" name="sell_date" autocomplete="off" class="formo" placeholder="Crop sale date" required> 
+            </fieldset>
+
+            <fieldset><legend > Bags and Vehicles </legend>
+              <input type="number" name="bags_req" autocomplete="off" class="formo" placeholder="No: of bags required">  
+              <select name="vehicle_type_req" class="formo">
+                <option value="Tractor"> Tractor </option>
+                <option value="Lory"> Lory </option>
+                <option value="Truck"> Truck </option>
+                <option value="Van"> Van </option>
+              </select>
+            </fieldset>
+            
+            <fieldset><legend > Pick-up Time and Address </legend>
+              <input type="time" name="pick_up_time" autocomplete="off" class="formo" placeholder="Time of sending crop"  value="16:30"required>
+              <textarea  class="formo" name ="pick_up_address" placeholder="Crop pick up address" onfocus="this.style.outline='none'" style=" word-wrap: normal; height:50px; overflow: hidden">{{ user_details['address'] }}</textarea>
+            </fieldset>            
+          </center>
+        <br><br><br><br>
+        <button type="submit" class="btn reverse" style="width: 50%; margin:auto;"><b>SUBMIT</b></button><br><br>
+        
+        <script>
+          var farmer_name = "{{ user_details['fullname'] }}"
+          var farmer_mandal = "{{ user_details['mandal'] }}"
+          var rbk_id = "{{ user_details['rbk_id'] }}"
+        </script>
+        <script src="{{ url_for('static',filename='js/updates.js') }}"></script>
+      </form>
+    </div>
+
+    <div id="form_2" style="display: none;">
+      <div  style="width: 90%; border:none; margin: 50px auto;">
+        <center>
+            <table>
+              <tr>
+                <th>Crop ID</th>
+                <th>Survey No.</th>
+                <th>Crop Type</th>
+                <th>Crop Cut Date</th>
+                <th>Quality Check Date</th>
+                <th>Sell Date</th>
+                <th>No. of Bags</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+              {% for record in crops %}
+              <tr>
+                <td> {{ record['crop_id'] }}</td>
+                <td> {{ record['survey_no'] }}</td>
+                <td> {{ record['crop_type'] }}</td>
+                <td> {{ record['cut_date'] }}</td>
+                <td> {{ record['qc_date'] }}</td>
+                <td> {{ record['sell_date'] }}</td>
+                <td> {{ record['bags_req'] }}</td>
+                <td> {{ record['amount'] }}</td>
+                <td> {{ record['status'] }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+        </center>
+      </div>
+
+      <div  style="width: 60%; border:none; margin: 50px auto;">
+        <center>
+            <table>
+              <tr>
+                <th>Crop ID</th>
+                <th>Track ID</th>
+                <th>Vehicle Type</th>
+                <th>Vehical No.</th>
+                <th>RiceMill</th>
+                <th>Pick Up Date</th>
+                <th>Pick Up Time</th>
+
+              </tr>
+              {% for record in transports %}
+              <tr>
+                <td> {{ record['crop_id'] }}</td>
+                <td> {{ record['track_id'] }}</td>
+                <td> {{ record['vehicle_type'] }}</td>
+                <td> {{ record['vehicle_no'] }}</td>
+                <td> {{ record['to_'] }}</td>
+                <td> {{ record['date_booked'] }}</td>
+                <td> {{ record['time_slot'] }}</td>
+              </tr>
+              {% endfor %}
+              
+            </table>
+        </center>
+      </div>
+    </div>
+
+    <div id="form_3" style="display: none;">
+      <form style="border:none; width:70%" >
+        <center>
+            <!-- <h1 class="title"><u> Registration form 1</u></h1> -->
+            <fieldset><legend >Select Survey Number </legend>
+              <select id="msg_survey_no" class="formo">
+                {% for each in surveys %}
+                <option value="{{ each['survey_no'] }}"> {{ each['survey_no'] }} </option>
+                {% endfor %}
+              </select>
+            </fieldset>
+            <fieldset><legend > Enter your Message </legend>
+              <textarea id="msg_content" class="" style="width:100%; height:200px; border:none;" onfocus="this.style.outline='none'"></textarea>
+            </fieldset> 
+            <br><br><br><br>
+            <button type="button" onclick="send_msg()" class="btn reverse"><b>SUBMIT</b></button><br><br>
+        </center>
+      </form>
+    </div>
+    
+    <script>
+              var c_fullname = "{{ user_details['fullname'] }}"
+              var c_phone = "{{ user_details['phone'] }}"
+    </script>
+    <script src="{{ url_for('static',filename='js/send_msg.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/btns.js') }}"></script>
+
+{% endblock %}
